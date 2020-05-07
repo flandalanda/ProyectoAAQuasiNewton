@@ -1,7 +1,7 @@
 % Script to perform excercise 2.2
-clear;   close all;   clc;
+clear;   close all;   clc; format long;
 
-%Define extende Rosenbrock function (generalized banana function)
+%Define extended Rosenbrock function (generalized banana function)
 f=@(x) rosenbrock(x);
 
 %Setting aux variables
@@ -20,10 +20,10 @@ rosenrcSR1=zeros(4,5);
 errBFGS=zeros(4,5);
 errLM=zeros(4,5);
 errrcSR1=zeros(4,5);
-
+m = 3;
 
 %Running all methods for n={2,8,32,128} and x_0 [-1.2,1,-1.2,....,1]
-
+tic
 for i=1:4
     xsize=2^(2*i-1);
     x_0=ones(xsize,1);
@@ -41,36 +41,37 @@ for i=1:4
 
 %       gradfinLM(i,5)=norm(apGrad(f,aux));
 %       for k=1:4
-%         [aux,aux2]=lineLM_BFGS( f, x_0, 10^(-5),iterLM(i)-k);  
+%         [aux,aux2]=lineLM_BFGS( f, x_0, 10^(-5),iterLM(i)-k,3);  
 %         gradfinLM(i,5-k)=norm(apGrad(f,aux));
 %         rosenLM(i,5-k)=f(aux);
 %         errLM1,5-k)=norm(ones(xsize)-aux);
 %       end
 
       tic    
-        [res,iterBFGS(i)]=lineBGFS( f, x_0, 10^(-5), 500);
         [aux,iterBFGS(i)]=lineBGFS( f, x_0, 10^(-5), 1000);
       TBFGS(i)=toc;
-      
+      errBFGS(i,5)=norm(ones(xsize)-aux);
       gradfinBFGS(i,5)=norm(apGrad(f,aux));
       for k=1:4
         [aux,aux2]=lineBGFS( f, x_0, 10^(-5),iterBFGS(i)-k);  
         gradfinBFGS(i,5-k)=norm(apGrad(f,aux));
         rosenBFGS(i,5-k)=f(aux);
-        errBFGS(1,5-k)=norm(ones(xsize)-aux);
+        errBFGS(i,5-k)=norm(ones(xsize)-aux);
       end
       
       tic 
         [res,iterrcSR1(i)]= rcSR1(f, x_0, 200);
       TrcSR1(i)=toc;
       
+      errrcSR1(i,5)=norm(ones(xsize)-aux);
       gradfinrcSR1(i,5)=norm(apGrad(f,aux));
       for k=1:4
         [aux,aux2]=rcSR1( f, x_0,iterrcSR1(i)-k);  
         gradfinrcSR1(i,5-k)=norm(apGrad(f,aux));
         rosenrcSR1(i,5-k)=f(aux);
-        errrcSR1(1,5-k)=norm(ones(xsize)-aux);
+        errrcSR1(i,5-k)=norm(ones(xsize)-aux);
       end
       
     end    
-end    
+end
+toc
