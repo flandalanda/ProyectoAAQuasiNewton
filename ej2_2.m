@@ -35,17 +35,19 @@ for i=1:4
         if mod(j,2)==1
             x_0(j)=-1.2;
         end 
-%     tic
-%       [res,iterLM(i)]=lineLM_BFGS( f, x_0, 10^(-5), 100 )
-%     TLM(i)=toc;
-
-%       gradfinLM(i,5)=norm(apGrad(f,aux));
-%       for k=1:4
-%         [aux,aux2]=lineLM_BFGS( f, x_0, 10^(-5),iterLM(i)-k,3);  
-%         gradfinLM(i,5-k)=norm(apGrad(f,aux));
-%         rosenLM(i,5-k)=f(aux);
-%         errLM1,5-k)=norm(ones(xsize)-aux);
-%       end
+    tic
+      [res,iterLM(i)]=lineLM_BFGS( f, x_0, 10^(-5), 100, 18)
+    TLM(i)=toc;
+      
+      rosenLM(i,5)=f(res);
+      errLM(i,5)=norm(ones(xsize)-aux);  
+      gradfinLM(i,5)=norm(apGrad(f,aux));
+      for k=1:4
+        [aux,aux2]=lineLM_BFGS( f, x_0, 10^(-5),iterLM(i)-k, 18);  
+        gradfinLM(i,5-k)=norm(apGrad(f,aux));
+        rosenLM(i,5-k)=f(aux);
+        errLM(i,5-k)=norm(ones(xsize)-aux);
+      end
 
       tic    
         [aux,iterBFGS(i)]=lineBGFS( f, x_0, 10^(-5), 1000);
