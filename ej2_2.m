@@ -1,7 +1,7 @@
 % Script to perform excercise 2.2
 clear;   close all;   clc; format long;
 
-%Define extended Rosenbrock function (generalized banana function)
+%Define extended Rosenbrock function (generalized extended banana function)
 f=@(x) rosenbrock(x);
 
 %Setting aux variables
@@ -79,3 +79,33 @@ for i=1:4
     end    
 end
 toc
+
+%Script that generates the needed tables 
+matBFGS=zeros(20,6);
+matLM=zeros(20,6);
+matrcSR1=zeros(20,6);
+itemsBFGS={iterBFGS,rosenBFGS,gradfinBFGS,errBFGS,TBFGS};
+itemsLM={iterLM,rosenLM,gradfinLM,errLM,TLM};
+itemsrcSR1={iterrcSR1,rosenrcSR1,gradfinrcSR1,errrcSR1,TrcSR1};
+
+for i=1:4
+    for k=1:5
+        matBFGS(5*(i-1)+k,1)=itemsBFGS{1}(i)-5+k;
+        matLM(5*(i-1)+k,1)=itemsLM{1}(i)-5+k;
+        matrcSR1(5*(i-1)+k,1)=itemsrcSR1{1}(i)-5+k;
+    end    
+    for j=2:5
+        matBFGS(5*(i-1)+1:5*i,j)=(itemsrcSR1{j}(i,:))';
+        matLM(5*(i-1)+1:5*i,j)=(itemsLM{j}(i,:))';
+        matrcSR1(5*(i-1)+1:5*i,j)=(itemsrcSR1{j}(i,:))';
+    end 
+    for k=1:5
+        matBFGS(5*(i-1)+k,6)=2^(2*i-1);
+        matLM(5*(i-1)+k,6)=2^(2*i-1);
+        matrcSR1(5*(i-1)+k,6)=2^(2*i-1);
+    end
+end
+
+tablaBFGS=latex(vpa(sym(matBFGS),16));
+tablaLM=latex(vpa(sym(matLM),16));
+tablarcSR1=latex(vpa(sym(matrcSR1),16));
