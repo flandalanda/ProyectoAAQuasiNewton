@@ -10,9 +10,9 @@ function [xk, k] = lineLM_BFGS( f, x0, tol, maxiter, m)
     gk = apGrad(f, x0);
     gnew = 1;
     xk = x0;
+    
     while norm(gnew) > tol
         dk = -evaluate_Hg(SS, GG, gk);
-        
         [alpha, gnew] = lineSearch( f, xk, dk, gk );
         
         s = alpha*dk;
@@ -30,7 +30,7 @@ function [xk, k] = lineLM_BFGS( f, x0, tol, maxiter, m)
         end
         
         gk = gnew;
-        k = k+1;   % STOP si es grade.
+        k = k+1;   % STOP si es grande.
         if  k >= maxiter
             break
         end
