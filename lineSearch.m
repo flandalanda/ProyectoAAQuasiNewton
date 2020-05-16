@@ -18,36 +18,36 @@ maxIter = 1000;
 iter = 1;
 aMax = 2;
 a0 = 0;
-alpha = 0.5*(a0+aMax);
 
 % We limit our iterations to a fixed number
 while(iter < maxIter)
+    % We select an alpha in the proposed interval
+    alpha = 0.5*(a0+aMax);
     % We evaluate the function at the proposed point
     phiA = f(xk + alpha*dk);
-    
-    % We check if any conditions have been violated
-    if phiA > phi0 + c1*alpha*phiPrime0 || (phiA >= phi0 && iter >1)
-        [alpha, gnew] = zoom( a0, alpha, f, xk, dk, phi0, phiPrime0);
-        break
-    end
     % We approximate the gradient at the new proposed point and calculate
     % the derivative with respect to alpha at said point
     gnew = apGrad(f, xk + alpha*dk);
-    phiPrimeA = gnew'*dk;    
-    if abs(phiPrimeA) <= -c2*phiPrime0
+    phiPrimeA = gnew'*dk;
+    
+    % We check if any conditions have been violated
+    if phiA > phi0 + c1*alpha*phiPrime0 || (phiA >= phi0 && iter >1)
+        [alpha, gnew] = zoom( a0, alpha, f, xk,dk, phi0, phiPrime0);
         break
-    end
-    if phiPrimeA >= 0
+    elseif abs(phiPrimeA) <= -c2*phiPrime0
+        break
+    elseif phiPrimeA >= 0
         [alpha, gnew] = zoom(alpha, a0, f, xk, dk, phi0, phiPrime0);
-        break
-    end
-    % We refine the interval
-    a0 = alpha;
-    alpha = 0.5*(alpha+aMax);
-    iter = iter + 1;
+        break;
+    else
+        % We refine the interval
+        a0 = alpha;
+        phi0 = phiA;
+        iter = iter + 1;
     end
 end
 
+end
 
 % Definition of auxiliary function zoom
 function [alpha, gnew] = zoom(alo, ahi, f, xk, dk, phi0, phiPrime0)
@@ -56,32 +56,31 @@ function [alpha, gnew] = zoom(alo, ahi, f, xk, dk, phi0, phiPrime0)
     
     iter = 1;
     maxIter = 1000;
+    phiLo = f(xk + alo*dk);
     
     while(iter < maxIter)
        % We select an alpha within the know interval and calculate the
-       % value of the function at the new point
+       % value of the function at the new point, as well as the gradient
+       % and derivative
        alpha = 0.5*(alo+ahi);
        phiA = f(xk+ alpha*dk);
-       phiLo = f(xk + alo*dk);
+       gnew = apGrad(f, xk + alpha*dk);
+       phiPrime1 = gnew'*dk;
+       
        % We check if any condition is not met
        if((phiA > phi0 + alpha*c1*phiPrime0) || (phiA >=phiLo))
            % If the step was too long, we refine the interval 
            ahi = alpha;
            % If W2 is met, we found a correct alpha
+       elseif abs(phiPrime1) <= -c2*phiPrime0
+           break
        else
-           % Value of the gradient and the derivative at the new point
-           gnew = apGrad(f, xk + alpha*dk);
-           phiPrime1 = gnew'*dk;
-           if abs(phiPrime1) <= -c2*phiPrime0
-                break
-           end
+           % We refine the interval depending on the conditions met
            if phiPrime1 * (ahi-alo)>=0
                ahi = alo;
-           end           
-           % We refine the interval depending on the conditions met           
+           end
            alo = alpha;
            iter = iter+1;
        end
     end
 end
-
